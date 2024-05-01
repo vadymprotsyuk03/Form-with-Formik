@@ -1,22 +1,5 @@
 import { useFormik } from "formik";
-
-const validate = values => {
-    const errors = {};
-
-    if (!values.name) {
-        errors.name = 'Required!';
-    } else if (values.name.length < 2) {
-        errors.name = 'Minimum 2 characters to fill in'
-    }
-
-    if (!values.email) {
-        errors.email = 'Required!';
-    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)) {
-        errors.email = 'Invalid email address';
-    }
-
-    return errors;
-}
+import * as Yup from 'yup';
 
 const Form = () => {
 
@@ -30,7 +13,24 @@ const Form = () => {
             terms: false
         },
 
-        validate,
+        validationSchema: Yup.object({
+            name: Yup.string()
+                .min(2, 'Minimum two symbols!')
+                .required('Required!'),
+            email: Yup.string()
+                .email('Invalid email adress!')
+                .required('Required!'),
+            amount: Yup.number()
+                .min(5, 'At least 5')
+                .required('Required!'),
+            currency: Yup.string().required('Choose a currency!'),
+            text: Yup.string()
+                .min(10, 'At least 10 symbols'),
+            terms: Yup.boolean()
+                .required('Consent is required!')
+                .oneOf([true], 'Consent is required!')
+                
+        }),
         onSubmit: values => console.log(JSON.stringify(values, null , 2))
     })
 
@@ -46,7 +46,7 @@ const Form = () => {
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
             />
-            {formik.errors.name && formik.touched.name ? <div>{formik.errors.name}</div> : null}
+            {formik.errors.name && formik.touched.name ? <div className="error">{formik.errors.name}</div> : null}
 
             <label htmlFor="email">Your email</label>
             <input
@@ -57,7 +57,7 @@ const Form = () => {
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
             />
-            {formik.errors.email && formik.touched.email ? <div>{formik.errors.email}</div> : null}
+            {formik.errors.email && formik.touched.email ? <div className="error">{formik.errors.email}</div> : null}
 
             <label htmlFor="amount">Amount</label>
             <input
@@ -68,6 +68,8 @@ const Form = () => {
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
             />
+            {formik.errors.amount && formik.touched.amount ? <div className="error">{formik.errors.amount}</div> : null}
+
             <label htmlFor="currency">Currency</label>
             <select
                 id="currency"
@@ -80,6 +82,8 @@ const Form = () => {
                     <option value="UAH">UAH</option>
                     <option value="RUB">RUB</option>
             </select>
+            {formik.errors.currency && formik.touched.currency ? <div className="error">{formik.errors.currency}</div> : null}
+
             <label htmlFor="text">Your message</label>
             <textarea 
                 id="text"
@@ -88,6 +92,8 @@ const Form = () => {
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
             />
+            {formik.errors.text && formik.touched.text ? <div className="error">{formik.errors.text}</div> : null}
+
             <label className="checkbox">
                 <input 
                 name="terms" 
@@ -97,6 +103,8 @@ const Form = () => {
                 onBlur={formik.handleBlur} />
                 Do you agree with the privacy policy?
             </label>
+            {formik.errors.terms && formik.touched.terms ? <div className="error">{formik.errors.terms}</div> : null}
+
             <button type="submit">Send</button>
         </form>
     )
